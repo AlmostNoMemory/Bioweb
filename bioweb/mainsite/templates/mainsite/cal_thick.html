@@ -1,0 +1,32 @@
+{% extends "mainsite/base.html" %}
+
+{% load bootstrap3 %}
+
+{% block header %}
+<h1>请上传图片</h1>
+<p>可以上传1-5张图片，如果图片较多，请<a href="{% url 'mainsite:cal2compress' %}">
+    点击此处上传rar或zip格式压缩包</p></a>
+{% endblock header %}
+
+{% block content %}
+
+<form enctype="multipart/form-data" action=""
+    method="post">
+{% csrf_token %}
+{{ form.as_p }}
+
+<input type="file" name="file_field" />
+<input type="file" name="file_field" />
+<input type="file" name="file_field" />
+<input type="file" name="file_field" />
+<input type="file" name="file_field" />
+<br>
+
+<p>点击提交按钮后等待页面跳转，然后点击下载结果下载存有尺寸信息的excel表格</p>
+
+{% buttons %}
+<button name="submit" class="btn btn-primary">提交</button>
+{% endbuttons %}
+</form>
+
+{% endblock content %}

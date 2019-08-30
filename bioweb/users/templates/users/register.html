@@ -1,0 +1,23 @@
+{% extends "mainsite/base.html" %}
+{% load bootstrap3 %}
+
+{% block header %}
+  <h3/>注册你的帐号</h3>
+    <p>请妥善保管好自己的帐号密码，暂不提供找回服务</p>
+{% endblock header %}
+
+
+{% block content %}
+
+  <form method="post" action="{% url 'users:register' %}"}>
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+    {% buttons %}
+    <button name="submit" class="btn btn-primary">注册</button>
+    {% endbuttons %}
+
+    <input type ="hidden" name="next" value="{% url 'mainsite:index' %}" />
+  </form>
+
+{% endblock content %}

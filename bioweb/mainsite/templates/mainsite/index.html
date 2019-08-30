@@ -1,0 +1,27 @@
+{% extends "mainsite/base.html" %}
+{% load static %}
+
+{% block header %}
+  <div class="jumbotron">
+    <a href="{% url 'mainsite:calculation' %}">
+    <h1>上传香菇图片并计算尺寸</h1></a>
+  </div>
+{% endblock header %}
+
+
+{% block content %}
+
+
+  <p>
+    <b>使用说明</b>
+    <br></br>
+    上传按照要求拍摄好的香菇图片，自动计算出香菇各个特征尺寸：茎盖的半径和厚度、茎的中轴线长度及宽度
+    <br></br>
+    <b>样例图片</b>
+    <br></br>
+    <img src="{% static "mainsite/index_1.png" %}" alt="index1" width="375" height="375">
+    <img src="{% static "mainsite/index_2.png" %}" alt="index2" width="375" height="375">
+    <img src="{% static "mainsite/index_3.png" %}" alt="index3" width="375" height="375">
+  </p>
+
+{% endblock content %}

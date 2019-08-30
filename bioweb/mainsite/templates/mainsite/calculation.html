@@ -1,0 +1,34 @@
+{% extends "mainsite/base.html" %}
+{% load static %}
+{% block header %}
+    <h3>本站提供了两种计算香菇尺寸的方式</h3>
+{% endblock header %}
+
+
+{% block content %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href="{% url 'mainsite:cal1' %}"><h3>茎长、宽度和盖半径计算</h3></a>
+    </div>
+    <div class="panel-body">
+      <p>请上传如下图所示的图片，需保证：香菇经方块的背景颜色为绿色，大方格尺寸为20cm×20cm作为标尺
+        ，内部4个小方格为10cm×10cm</p>
+      <img src="{% static "mainsite/cal_dia_sample_1.jpg" %}" alt="sample1"
+      width="648" height="486">
+    </div>
+  </div><!--panel-->
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+        <a href="{% url 'mainsite:cal2' %}"><h3>茎盖厚度计算</h3></a>
+      </div>
+      <div class="panel-body">
+        <p>请上传如下图片</p>
+        <img src="{% static "mainsite/cal_thick_sample.jpg" %}" alt="sample2"
+        width="636" height="486" >
+      </div>
+    </div><!--panel-->
+
+{% endblock content %}
