@@ -12,6 +12,8 @@ import cv2
 import numpy as np
 from . import bio_ClassAndFunction
 import zipfile
+import rarfile
+import shutil
 
 def index(request):
     # 主页
@@ -28,10 +30,10 @@ def cal_dia_centerline_width(request):
     # 计算中轴线、半径和宽度的界面
 
     # 清除cache目录下的文件
-    cache_path = "/home/zyf/PycharmProjects/bioweb/bioweb/cache"
-    for file in os.listdir(cache_path):
-        file = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/" + file
-        os.remove(file)
+    cache_path = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/"
+    shutil.rmtree(cache_path)
+    # 创建新的cache文件夹
+    os.mkdir(cache_path)
 
     if request.method != 'POST':
         form = FileFieldForm()
@@ -64,9 +66,9 @@ def cal_dia_centerline_width_compress(request):
 
     # 清除cache目录下的文件
     cache_path = "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache"
-    for file in os.listdir(cache_path):
-        file = "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + file
-        os.remove(file)
+    shutil.rmtree(cache_path)
+    # 创建新的cache文件夹
+    os.mkdir(cache_path)
 
     if request.method != 'POST':
         form = FileFieldForm()
@@ -87,11 +89,22 @@ def cal_dia_centerline_width_compress(request):
             file_sorted = sorted(os.listdir("/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache"))
             for filename in file_sorted:
                 print(filename)
-                target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
-                f = zipfile.ZipFile(target,'r')
-                for file in f.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
-                    f.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
-                print("解压完成")
+                format = str(filename).split('.')[-1]
+                print(format)
+                #if format != 'zip' or format != 'rar':
+                if format == 'zip':
+                    target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
+                    zipf = zipfile.ZipFile(target,'r')
+                    for file in zipf.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
+                        zipf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    print("zip解压完成")
+                if format == 'rar':
+                    target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
+                    rarf = rarfile.RarFile(target)
+                    for file in rarf.namelist():
+                        rarf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    #rarf.extractall("/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+
             bio_ClassAndFunction.cal_dia()    # 调用处理函数
             print("处理完成")
 
@@ -103,6 +116,13 @@ def cal_dia_centerline_width_compress(request):
 
 @login_required
 def cal_thickness(request):
+
+    # 清除cache目录下的文件
+    cache_path = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/"
+    shutil.rmtree(cache_path)
+    # 创建新的cache文件夹
+    os.mkdir(cache_path)
+
     # 计算厚度的界面
     if request.method != 'POST':
         form = FileFieldForm()
@@ -119,7 +139,7 @@ def cal_thickness(request):
                     destination.write(chunk)
                 destination.close()
                 print("写入到本地--完成")
-            bio_ClassAndFunction.cal_thick(80)              # 这里需要填入计算厚度的参考长度pixelsPerCM
+            bio_ClassAndFunction.cal_thick(99)              # 这里需要填入计算厚度的参考长度pixelsPerCM
             print("处理完成")
 
 
@@ -133,11 +153,11 @@ def cal_thickness(request):
 def cal_thickness_compress(request):
     # 计算厚度  压缩包处理界面
 
-    # 清除cache目录下的文件
+    # 删除就的cache文件夹
     cache_path = "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache"
-    for file in os.listdir(cache_path):
-        file = "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + file
-        os.remove(file)
+    shutil.rmtree(cache_path)
+    # 创建新的cache文件夹
+    os.mkdir(cache_path)
 
     if request.method != 'POST':
         form = FileFieldForm()
@@ -157,13 +177,14 @@ def cal_thickness_compress(request):
             # 解压操作
             file_sorted = sorted(os.listdir("/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache"))
             for filename in file_sorted:
-                print(filename)
+                format = str(filename).split('.')[-1]
+                print(format)
                 target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
                 f = zipfile.ZipFile(target,'r')
                 for file in f.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
                     f.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
                 print("解压完成")
-            bio_ClassAndFunction.cal_thick(80)    # 调用处理函数
+            bio_ClassAndFunction.cal_thick(99)    # 调用处理函数
             print("处理完成")
 
 
