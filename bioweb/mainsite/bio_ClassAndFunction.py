@@ -312,9 +312,12 @@ class ProcessMethod():
         # cv2.imshow("src", self.src)
         return self.thickness
 
+
+
 def cal_dia(argv=None):
     # 网页后端直接调用
     # 计算缓存文件夹下面图片的尺寸并保存excel文件
+    support_img_file = ['jpg', 'png', 'jpeg', 'bmp', 'tif', 'gif', 'webp', 'psd']
     ws = xlwt.Workbook(encoding='utf-8')
     w = ws.add_sheet('中轴线、宽度、半径信息', cell_overwrite_ok=True)
     w.write(0, 0, '图片名')
@@ -327,6 +330,7 @@ def cal_dia(argv=None):
     w.write(0, 6, '宽度3')
     w.write(0, 7, '宽度4')
     w.write(0, 8, '宽度5')
+    w.write(0, 9, '平均宽度')
     excelname = '/home/zyf/PycharmProjects/bioweb/bioweb/cache/result.xls'
     row = 1
     for root, dirs, files in os.walk("/home/zyf/PycharmProjects/bioweb/bioweb/cache"):
@@ -336,130 +340,141 @@ def cal_dia(argv=None):
                 path = os.path.join(root, dir)
                 file_sorted = sorted(os.listdir(path))
                 for filename in file_sorted:
-                    print(filename)
-                    imgname = os.path.join(path, filename)
-                    print(imgname)
-                    try:
-                        src = image(imgname, pixelsPerCM=81, referenceLength=20)
-                        part1, part2, part3, part4 = src.image_segmentation()
-                        proce1 = ProcessMethod(part1)
-                        diameter = proce1.cal_diameter()
-                        proce2 = ProcessMethod(part2)
-                        midAxis, width = proce2.cal_MidAxis_Width()
-                        print(diameter[0] / src.pixelsPerCM)
-                    except:
-                        # 处理出错 则跳过该图像
-                        w.write(row, 0, filename)
-                        w.write(row, 1, "该图像或文件无法处理")
-                        w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
-                        continue
+                	fileformat = filename.split('.')[-1]
+                	if fileformat.lower() in support_img_file: 
+	                    print(filename)
+	                    imgname = os.path.join(path, filename)
+	                    print(imgname)
+	                    try:
+	                        src = image(imgname, pixelsPerCM=81, referenceLength=20)
+	                        part1, part2, part3, part4 = src.image_segmentation()
+	                        proce1 = ProcessMethod(part1)
+	                        diameter = proce1.cal_diameter()
+	                        proce2 = ProcessMethod(part2)
+	                        midAxis, width = proce2.cal_MidAxis_Width()
+	                        print(diameter[0] / src.pixelsPerCM)
+	                    except:
+	                        # 处理出错 则跳过该图像
+	                        w.write(row, 0, filename)
+	                        w.write(row, 1, "该图像或文件无法处理")
+	                        w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
+	                        continue
 
-                    else:
-                        w.write(row, 0, filename)
-                        w.write(row, 1, "%.2f cm" % (diameter[0] / src.pixelsPerCM))
-                        w.write(row, 2, "%.2f cm" % (diameter[1] / src.pixelsPerCM))
-                        w.write(row, 3, "%.2f cm" % (midAxis / src.pixelsPerCM))
-                        w.write(row, 4, "%.2f cm" % (width[0] / src.pixelsPerCM))
-                        w.write(row, 5, "%.2f cm" % (width[1] / src.pixelsPerCM))
-                        if len(width) > 2:
-                            w.write(row, 6, "%.2f cm" % (width[2] / src.pixelsPerCM))
-                            if len(width) > 3:
-                                w.write(row, 7, "%.2f cm" % (width[3] / src.pixelsPerCM))
-                                if len(width) > 4:
-                                    w.write(row, 8, "%.2f cm" % (width[4] / src.pixelsPerCM))
-                        print("\n")
-                    row += 1
+	                    else:
+	                        w.write(row, 0, filename)
+	                        w.write(row, 1, "%.2f cm" % (diameter[0] / src.pixelsPerCM))
+	                        w.write(row, 2, "%.2f cm" % (diameter[1] / src.pixelsPerCM))
+	                        w.write(row, 3, "%.2f cm" % (midAxis / src.pixelsPerCM))
+	                        w.write(row, 4, "%.2f cm" % (width[0] / src.pixelsPerCM))
+	                        w.write(row, 5, "%.2f cm" % (width[1] / src.pixelsPerCM))
+	                        if len(width) > 2:
+	                            w.write(row, 6, "%.2f cm" % (width[2] / src.pixelsPerCM))
+	                            if len(width) > 3:
+	                                w.write(row, 7, "%.2f cm" % (width[3] / src.pixelsPerCM))
+	                                if len(width) > 4:
+	                                    w.write(row, 8, "%.2f cm" % (width[4] / src.pixelsPerCM))
+	                        w.write(row, 9, "%.2f cm" % (np.array(width).mean() / src.pixelsPerCM))            
+	                        print("\n")
+	                    row += 1
         else:
             file_sorted = sorted(os.listdir("/home/zyf/PycharmProjects/bioweb/bioweb/cache"))
             for filename in file_sorted:
                 print(filename)
                 print(row)
                 imgname = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/" + filename
-                print(imgname)
-                try:
-                    src = image(imgname, pixelsPerCM=81, referenceLength=20)
-                    part1, part2, part3, part4 = src.image_segmentation()
-                    proce1 = ProcessMethod(part1)
-                    diameter = proce1.cal_diameter()
-                    proce2 = ProcessMethod(part2)
-                    midAxis, width = proce2.cal_MidAxis_Width()
-                    print(diameter[0] / src.pixelsPerCM)
-                except:
-                    # 处理出错 则跳过该图像
-                    w.write(row, 0, filename)
-                    w.write(row, 1, "该图像无法处理")
-                    w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
-                    continue
+                fileformat = filename.split('.')[-1]
+                if fileformat.lower() in support_img_file: 
+	                print(imgname)
+	                try:
+	                    src = image(imgname, pixelsPerCM=81, referenceLength=20)
+	                    part1, part2, part3, part4 = src.image_segmentation()
+	                    proce1 = ProcessMethod(part1)
+	                    diameter = proce1.cal_diameter()
+	                    proce2 = ProcessMethod(part2)
+	                    midAxis, width = proce2.cal_MidAxis_Width()
+	                    print(diameter[0] / src.pixelsPerCM)
+	                except:
+	                    # 处理出错 则跳过该图像
+	                    w.write(row, 0, filename)
+	                    w.write(row, 1, "该图像无法处理")
+	                    w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
+	                    continue
 
-                else:
-                    w.write(row, 0, filename)
-                    w.write(row, 1, "%.2f cm" % (diameter[0] / src.pixelsPerCM))
-                    w.write(row, 2, "%.2f cm" % (diameter[1] / src.pixelsPerCM))
-                    w.write(row, 3, "%.2f cm" % (midAxis / src.pixelsPerCM))
-                    w.write(row, 4, "%.2f cm" % (width[0] / src.pixelsPerCM))
-                    w.write(row, 5, "%.2f cm" % (width[1] / src.pixelsPerCM))
-                    if len(width) > 2:
-                        w.write(row, 6, "%.2f cm" % (width[2] / src.pixelsPerCM))
-                        if len(width) > 3:
-                            w.write(row, 7, "%.2f cm" % (width[3] / src.pixelsPerCM))
-                            if len(width) > 4:
-                                w.write(row, 8, "%.2f cm" % (width[4] / src.pixelsPerCM))
-                    print("\n")
-                row += 1
+	                else:
+	                    w.write(row, 0, filename)
+	                    w.write(row, 1, "%.2f cm" % (diameter[0] / src.pixelsPerCM))
+	                    w.write(row, 2, "%.2f cm" % (diameter[1] / src.pixelsPerCM))
+	                    w.write(row, 3, "%.2f cm" % (midAxis / src.pixelsPerCM))
+	                    w.write(row, 4, "%.2f cm" % (width[0] / src.pixelsPerCM))
+	                    w.write(row, 5, "%.2f cm" % (width[1] / src.pixelsPerCM))
+	                    if len(width) > 2:
+	                        w.write(row, 6, "%.2f cm" % (width[2] / src.pixelsPerCM))
+	                        if len(width) > 3:
+	                            w.write(row, 7, "%.2f cm" % (width[3] / src.pixelsPerCM))
+	                            if len(width) > 4:
+	                                w.write(row, 8, "%.2f cm" % (width[4] / src.pixelsPerCM))
+	                    w.write(row, 9, "%.2f cm" % (np.array(width).mean() / src.pixelsPerCM))  
+	                    print("\n")
+	                row += 1
 
     ws.save(excelname)                  # 保存excel文件
 
 def cal_thick(pixelsPerCM):
-        pixelsPerCM = pixelsPerCM
-        ws = xlwt.Workbook(encoding='utf-8')
-        w = ws.add_sheet('半径信息', cell_overwrite_ok=True)
-        w.write(0, 0, '图片名')
-        w.write(0, 1, '厚度')
-        excelname = '/home/zyf/PycharmProjects/bioweb/bioweb/cache/result.xls'
-        row = 1
+    support_img_file = ['jpg', 'png', 'jpeg', 'bmp', 'tif', 'gif', 'webp', 'psd']
+    pixelsPerCM = pixelsPerCM
+    ws = xlwt.Workbook(encoding='utf-8')
+    w = ws.add_sheet('半径信息', cell_overwrite_ok=True)
+    w.write(0, 0, '图片名')
+    w.write(0, 1, '厚度')
+    excelname = '/home/zyf/PycharmProjects/bioweb/bioweb/cache/result.xls'
+    row = 1
 
-        for root, dirs, files in os.walk("/home/zyf/PycharmProjects/bioweb/bioweb/cache"):
-            if dirs:
-                # 如果有其他文件夹 就遍历这些文件夹
-                for dir in dirs:
-                    path = os.path.join(root, dir)
-                    file_sorted = sorted(os.listdir(path))
-                    for filename in file_sorted:
-                        print(filename)
-                        imgname = os.path.join(path, filename)
-                        print(imgname)
-                        try:
-                            src = image(imgname, pixelsPerCM=pixelsPerCM, referenceLength=20)
-                            src = ProcessMethod(src.image)
-                            thickness = src.cal_thickness()
-                        except:
-                            w.write(row, 0, filename)
-                            w.write(row, 1, "该图像无法处理")
-                            w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
-                        else:
-
-                            w.write(row, 0, filename)
-                            w.write(row, 1, "%.2f cm" % (thickness / pixelsPerCM))   # 这里需要修改 计算厚度的标尺不明
-                        row += 1
-                        
-            else:
-                file_sorted = sorted(os.listdir("/home/zyf/PycharmProjects/bioweb/bioweb/cache"))
+    for root, dirs, files in os.walk("/home/zyf/PycharmProjects/bioweb/bioweb/cache"):
+        if dirs:
+            # 如果有其他文件夹 就遍历这些文件夹
+            for dir in dirs:
+                path = os.path.join(root, dir)
+                file_sorted = sorted(os.listdir(path))
                 for filename in file_sorted:
-                    print(filename)
-                    print(row)
-                    imgname = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/" + filename
-                    print(imgname)
-                    try:
-                        src = image(imgname, pixelsPerCM=pixelsPerCM, referenceLength=20)
-                        src = ProcessMethod(src.image)
-                        thickness = src.cal_thickness()
-                    except:
-                        w.write(row, 0, filename)
-                        w.write(row, 1, "该图像无法处理")
-                        w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
-                    else:
-                        w.write(row, 0, filename)
-                        w.write(row, 1, "%.2f cm" % (thickness / pixelsPerCM))   # 这里需要修改 计算厚度的标尺不明
-                    row += 1
+                	fileformat = filename.split('.')[-1]
+                	if fileformat.lower()  in support_img_file: 
+	                    print(filename)
+	                    imgname = os.path.join(path, filename)
+	                    print(imgname)
+	                    try:
+	                        src = image(imgname, pixelsPerCM=pixelsPerCM, referenceLength=20)
+	                        src = ProcessMethod(src.image)
+	                        thickness = src.cal_thickness()
+	                    except:
+	                        w.write(row, 0, filename)
+	                        w.write(row, 1, "该图像无法处理")
+	                        w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
+	                    else:
 
-        ws.save(excelname)
+	                        w.write(row, 0, filename)
+	                        w.write(row, 1, "%.2f cm" % (thickness / pixelsPerCM))   # 这里需要修改 计算厚度的标尺不明
+	                    row += 1
+                    
+        else:
+            file_sorted = sorted(os.listdir("/home/zyf/PycharmProjects/bioweb/bioweb/cache"))
+            for filename in file_sorted:
+                print(filename)
+                print(row)
+                imgname = "/home/zyf/PycharmProjects/bioweb/bioweb/cache/" + filename
+                fileformat = filename.split('.')[-1]
+                if fileformat.lower()  in support_img_file: 
+	                print(imgname)
+	                try:
+	                    src = image(imgname, pixelsPerCM=pixelsPerCM, referenceLength=20)
+	                    src = ProcessMethod(src.image)
+	                    thickness = src.cal_thickness()
+	                except:
+	                    w.write(row, 0, filename)
+	                    w.write(row, 1, "该图像无法处理")
+	                    w.write(row, 2, "可能原因：香菇尺寸过小，背景不够清晰;或者文件格式不正确")
+	                else:
+	                    w.write(row, 0, filename)
+	                    w.write(row, 1, "%.2f cm" % (thickness / pixelsPerCM))   # 这里需要修改 计算厚度的标尺不明
+	                row += 1
+
+    ws.save(excelname)

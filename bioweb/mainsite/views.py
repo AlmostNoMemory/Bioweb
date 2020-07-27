@@ -97,13 +97,15 @@ def cal_dia_centerline_width_compress(request):
                     zipf = zipfile.ZipFile(target,'r')
                     for file in zipf.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
                         zipf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
-                    print("zip解压完成")
+                    print("zip文件解压完成")
+
                 if format == 'rar':
                     target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
                     rarf = rarfile.RarFile(target)
                     for file in rarf.namelist():
                         rarf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
                     #rarf.extractall("/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    print("rar文件解压完成")
 
             bio_ClassAndFunction.cal_dia()    # 调用处理函数
             print("处理完成")
@@ -179,11 +181,22 @@ def cal_thickness_compress(request):
             for filename in file_sorted:
                 format = str(filename).split('.')[-1]
                 print(format)
-                target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
-                f = zipfile.ZipFile(target,'r')
-                for file in f.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
-                    f.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
-                print("解压完成")
+
+                if format == 'zip':
+                    target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
+                    zipf = zipfile.ZipFile(target,'r')
+                    for file in zipf.namelist(): #f.namelist()返回列表，列表中的元素为压缩文件中的每个文件
+                        zipf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    print("zip文件解压完成")
+                if format == 'rar':
+                    target =  "/home/zyf/PycharmProjects/bioweb/bioweb/compress_cache/" + filename
+                    rarf = rarfile.RarFile(target)
+                    for file in rarf.namelist():
+                        rarf.extract(file,"/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    #rarf.extractall("/home/zyf/PycharmProjects/bioweb/bioweb/cache/")
+                    print("rar文件解压完成")
+
+
             bio_ClassAndFunction.cal_thick(99)    # 调用处理函数
             print("处理完成")
 
