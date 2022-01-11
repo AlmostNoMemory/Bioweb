@@ -25,7 +25,7 @@ SECRET_KEY = 'uh6e128t7ye7hniuf9vb2%(n-*_)li$(n5#e)vp@s^6szs8(jv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.114']
 
 
 # Application definition
@@ -126,6 +126,11 @@ STATIC_URL = '/static/'
 
 # 设置
 LOGIN_URL = '/users/login'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
 
 # Bootstrap3设置
 BOOTSTRAP3 = {

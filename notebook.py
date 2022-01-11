@@ -94,7 +94,7 @@ cv2.bitwise_or()                            # 或运算
 
 # eg： 调整亮度和对比度
 def contrast_brighness(image, b, c):
-    h, w, ch = image.shapeb
+    h, w, ch = image.shape
     blank = np.zeros([h, w, ch], image.dtype)
     dst = cv2.addWeighted(image, c, blank, 1-c, b)
     cv2.imshow("contrast", dst)
